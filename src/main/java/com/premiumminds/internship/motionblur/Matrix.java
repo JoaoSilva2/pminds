@@ -1,27 +1,29 @@
 package com.premiumminds.internship.motionblur;
 
+import java.util.Arrays;
+
 /**
  * Class that represents the structure of a matrix
  */
 public class Matrix{
 
     private int[][] _data;
-    private int _heigth;
+    private int _height;
     private int _width;
 
-    public Matrix(int heigth, int width) {
-        _data = new int[heigth][width];
-        _heigth = heigth;
+    public Matrix(int height, int width) {
+        _data = new int[height][width];
+        _height = height;
         _width = width;
     }
     public Matrix(int[][] data){
         _data = data;
-        _heigth = data.length;
+        _height = data.length;
         _width = data[0].length;
     }
 
-    public int getHeigth(){
-        return _heigth;
+    public int getHeight(){
+        return _height;
     }
 
     public int getWidth(){
@@ -40,14 +42,13 @@ public class Matrix{
      * @return boolean
      */
     public boolean lastElement(int y, int x){
-        return y == _heigth - 1 && x == _width - 1;
+        return y == _height - 1 && x == _width - 1;
     }
 
     /**
      * Method check if the coordinates given correspond to the last element of
      * the matrix
-     * @param y
-     * @param x
+     * @param coord
      * @return boolean
      */
     public boolean lastElement(int[] coord){
@@ -71,8 +72,7 @@ public class Matrix{
 
     /**
      * Method to get an element from the matrix in the corresponding coordinate
-     * @param y
-     * @param x
+     * @param coord
      * @return integer
      */
     public int getElement(int[] coord){
@@ -92,8 +92,7 @@ public class Matrix{
     /**
      * Method that adds an element to the matrix on the given coordinates
      * @param value
-     * @param y
-     * @param x
+     * @param coord
      */
     public void addElement(int value, int[] coord){
         addElement(value, coord[0], coord[1]);
@@ -107,15 +106,14 @@ public class Matrix{
      * @return boolean
      */
     public boolean outOfBounds(int y, int x){
-        return y >= _heigth || x >= _width ||
+        return y >= _height || x >= _width ||
                y < 0 || x < 0;
     }
 
     /**
      * Method that checks if coordinates corresponds to an out of bounds locati-
      * on
-     * @param y
-     * @param x
+     * @param coord
      * @return boolean
      */
     public boolean outOfBounds(int[] coord){
@@ -132,7 +130,7 @@ public class Matrix{
         int[] new_coord = new int[2];
 
         int new_x = (x+1)%_width;
-        int new_y = new_x < x ? (y+1)%_heigth : y;
+        int new_y = new_x < x ? (y+1)%_height : y;
 
         new_coord[0] = new_y;
         new_coord[1] = new_x;
@@ -142,8 +140,7 @@ public class Matrix{
 
     /**
      * Method that calculates the next position in the matrix left to right
-     * @param y
-     * @param x
+     * @param coord
      * @return array of integers
      */
     public int[] nextCoord(int[] coord){
@@ -160,10 +157,20 @@ public class Matrix{
     public int[] getAdjacentElements(int y, int x){
         int[] adjacentElements = new int[3];
         
-        adjacentElements[0] = outOfBounds(y, x-1) ? 0 : _data[y][x-1];
-        adjacentElements[1] = outOfBounds(y-1, x) ? 0 : _data[y-1][x];
-        adjacentElements[2] = outOfBounds(y+1, x) ? 0 : _data[y+1][x];
+        adjacentElements[0] = outOfBounds(y, x-1) ? -1 : _data[y][x-1];
+        adjacentElements[1] = outOfBounds(y-1, x) ? -1 : _data[y-1][x];
+        adjacentElements[2] = outOfBounds(y+1, x) ? -1 : _data[y+1][x];
 
-        return adjacentElements;
+        return Arrays.stream(adjacentElements).filter(i -> i != -1).toArray();
+    }
+
+    /**
+     * Method that gets the adjacent elements of a coordinate.
+     * left, above, below
+     * @param coord
+     * @return array of integers
+     */
+    public int[] getAdjacentElements(int[] coord){
+        return getAdjacentElements(coord[0], coord[1]);
     }
 }
