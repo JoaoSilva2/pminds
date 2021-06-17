@@ -49,6 +49,13 @@ public class MotionBlurTest {
    * Implement more tests...
    */
 
+  @Test
+  public void MotionBlurSingleThreadM1With1WorkerTest()
+      throws InterruptedException, ExecutionException, TimeoutException {
+    Future<int[][]> step1 = new MotionBlurSingleThread().run(MatrixData.M1, 1);
+    int[][] result = step1.get(10, TimeUnit.SECONDS);
+    assertTrue(Arrays.deepEquals(result, M1result));
+  }
 
 
 
