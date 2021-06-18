@@ -190,6 +190,10 @@ public class Matrix{
         return _width*_height;
     }
 
+    /**
+     * Method that checks if all positions
+     * @return
+     */
     public boolean isComplete(){
         int[] aux = Arrays.stream(_map).filter(i -> i == -1).toArray();
 

@@ -11,6 +11,7 @@ class MatrixMotionBlur implements Runnable {
   private Matrix _result;
   private int[] _coord = {0, 0};
   private int[] _map;
+  private int _computedPositions = 0;
 
   public MatrixMotionBlur(Matrix data, Matrix result){
       _data = data;
@@ -45,6 +46,7 @@ class MatrixMotionBlur implements Runnable {
         return true;
     }
     _map[map_index] = -1;
+    _computedPositions += 1;
     _coord = _data.nextCoord(_coord);
     return false;
   }
@@ -54,7 +56,7 @@ class MatrixMotionBlur implements Runnable {
    * Returns when all position have been processed.
    */
   public void recursiveMatrixMotionBlur(){
-    if(_result.isComplete()){
+    if(isComplete()){
         return;
     }
 
@@ -72,7 +74,18 @@ class MatrixMotionBlur implements Runnable {
     recursiveMatrixMotionBlur();  
   }
 
+  /**
+   * Method that starts calculating Motion Blur
+   */
   public void run() {
     recursiveMatrixMotionBlur();
+  }
+
+  /**
+   * Method that checks if all the positions of a matrix have been processed
+   * @return boolean
+   */
+  public boolean isComplete(){
+    return _computedPositions == _data.getWidth()*_data.getHeight();
   }
 }
