@@ -12,23 +12,37 @@ import java.util.concurrent.Future;
 class MotionBlurMultiThread implements MotionBlurFactory {
 
   private Matrix _result;
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-  private Runnable worker;
+  private ExecutorService _submitter = Executors.newSingleThreadExecutor();
+  private ExecutorService _executor;
+  private Runnable _matrixBlurCalculator;
 
-  public void calcMotionBlur(Matrix matrix, ExecutorService executor, int remaining_workers){
+  /**
+   * Method that executes the requested number of threads to calculate the
+   * Motion Blur
+   * 
+   * @param matrix
+   * @param remaining_workers
+   */
+  public void executeThreads(Matrix matrix, int remaining_workers){
     if(remaining_workers == 0){
       return;
     }
-    //Runnable worker = new MatrixMotionBlur(matrix, _result);
-    executor.execute(worker);
-    calcMotionBlur(matrix, executor, remaining_workers-1);
+
+    _executor.execute(_matrixBlurCalculator);
+    executeThreads(matrix, remaining_workers-1);
   }
 
-  public void executeThreads(Matrix matrix, int numberOfWorkers){
-    ExecutorService executor = Executors.newFixedThreadPool(numberOfWorkers);
-    calcMotionBlur(matrix, executor, numberOfWorkers);
-    executor.shutdown();
-    while (!executor.isTerminated()) {
+  /**
+   * Method that executes the threads and waits for them to finish before retur-
+   * ning
+   * 
+   * @param matrix
+   * @param numberOfWorkers
+   */
+  public void createThreads(Matrix matrix, int numberOfWorkers){
+    executeThreads(matrix, numberOfWorkers);
+    _executor.shutdown();
+    while (!_executor.isTerminated()) {
     }
   }
 
@@ -41,12 +55,15 @@ class MotionBlurMultiThread implements MotionBlurFactory {
    */
   public Future<int[][]> run(int[][] data, int numberOfWorkers) {
 
-    Matrix mat = new Matrix(data);
-    _result = new Matrix(mat.getHeight(), mat.getWidth());
-    worker = new MatrixMotionBlur(mat, _result);
-    executeThreads(mat, numberOfWorkers);
+    Matrix matrix = new Matrix(data);
 
-    return executor.submit(() -> {
+    _result = new Matrix(matrix.getHeight(), matrix.getWidth());
+    _executor = Executors.newFixedThreadPool(numberOfWorkers);
+    _matrixBlurCalculator = new MatrixMotionBlur(matrix, _result);
+
+    createThreads(matrix, numberOfWorkers);
+
+    return _submitter.submit(() -> {
       return _result.getData();
     });
   }
