@@ -12,22 +12,21 @@ import java.util.concurrent.Future;
 class MotionBlurMultiThread implements MotionBlurFactory {
 
   private Matrix _result;
-  private int[] _coord = {0, 0};
   private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private Runnable worker;
 
-  public void calcMotionBlur(Matrix matrix, ExecutorService executor, int[] coord, int computed_pos){
-    if(computed_pos == matrix.getNumberOfElements()){
+  public void calcMotionBlur(Matrix matrix, ExecutorService executor, int remaining_workers){
+    if(remaining_workers == 0){
       return;
     }
-    Runnable worker = new MotionBlurThread(matrix, _result, coord);
+    //Runnable worker = new MatrixMotionBlur(matrix, _result);
     executor.execute(worker);
-
-    calcMotionBlur(matrix, executor, matrix.nextCoord(coord), computed_pos+1);
+    calcMotionBlur(matrix, executor, remaining_workers-1);
   }
 
   public void executeThreads(Matrix matrix, int numberOfWorkers){
     ExecutorService executor = Executors.newFixedThreadPool(numberOfWorkers);
-    calcMotionBlur(matrix, executor, _coord, 0);
+    calcMotionBlur(matrix, executor, numberOfWorkers);
     executor.shutdown();
     while (!executor.isTerminated()) {
     }
@@ -44,7 +43,7 @@ class MotionBlurMultiThread implements MotionBlurFactory {
 
     Matrix mat = new Matrix(data);
     _result = new Matrix(mat.getHeight(), mat.getWidth());
-
+    worker = new MatrixMotionBlur(mat, _result);
     executeThreads(mat, numberOfWorkers);
 
     return executor.submit(() -> {

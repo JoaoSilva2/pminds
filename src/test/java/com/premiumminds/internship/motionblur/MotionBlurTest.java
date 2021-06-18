@@ -60,8 +60,8 @@ public class MotionBlurTest {
   @Test
   public void MotionBlurSingleThreadEqualMultiThreadTest()
       throws InterruptedException, ExecutionException, TimeoutException {
-    Future<int[][]> step1 = new MotionBlurSingleThread().run(MatrixData.M2, 1);
-    Future<int[][]> step2 = new MotionBlurMultiThread().run(MatrixData.M2, 5);
+    Future<int[][]> step1 = new MotionBlurSingleThread().run(MatrixData.M1, 1);
+    Future<int[][]> step2 = new MotionBlurMultiThread().run(MatrixData.M1, 5);
     int[][] result1 = step1.get(10, TimeUnit.SECONDS);
     int[][] result2 = step2.get(10, TimeUnit.SECONDS);
     assertTrue(Arrays.deepEquals(result1, result2));

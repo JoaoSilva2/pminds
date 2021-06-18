@@ -8,11 +8,13 @@ import java.util.Arrays;
 public class Matrix{
 
     private int[][] _data;
+    private int[] _map;
     private int _height;
     private int _width;
 
     public Matrix(int height, int width) {
         _data = new int[height][width];
+        _map = new int[height*width];
         _height = height;
         _width = width;
     }
@@ -88,6 +90,10 @@ public class Matrix{
     public void addElement(int value, int y, int x){
         if(!outOfBounds(y, x)){
             _data[y][x] = value;
+
+            int map_index = x + y*_width;
+            _map[map_index] = -1;
+
         }
     }
 
@@ -182,5 +188,11 @@ public class Matrix{
      */
     public int getNumberOfElements(){
         return _width*_height;
+    }
+
+    public boolean isComplete(){
+        int[] aux = Arrays.stream(_map).filter(i -> i == -1).toArray();
+
+        return aux.length == _width*_height;
     }
 }
