@@ -86,7 +86,9 @@ public class Matrix{
      * @param x
      */
     public void addElement(int value, int y, int x){
-        _data[y][x] = value;
+        if(!outOfBounds(y, x)){
+            _data[y][x] = value;
+        }
     }
 
     /**
@@ -172,5 +174,13 @@ public class Matrix{
      */
     public int[] getAdjacentElements(int[] coord){
         return getAdjacentElements(coord[0], coord[1]);
+    }
+
+    /**
+     * Method that returns the number of elements of the matrix
+     * @return integer
+     */
+    public int getNumberOfElements(){
+        return _width*_height;
     }
 }
